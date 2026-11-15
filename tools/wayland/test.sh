@@ -10,7 +10,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="$ROOT/build/wayland-test"
-IMAGE=plasmaxr-wayland-test
+IMAGE=${IMAGE:-plasmaxr-wayland-test}
 mkdir -p "$OUT"
 
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then

@@ -59,15 +59,20 @@
         </activity>
 
         <!--
-            Disabled by default. Enabling this alias makes Plasma XR selectable as the Home app:
-              adb shell pm enable org.plasmaxr.launcher/.HomeAlias
-            See docs/DEVICE_SETUP.md.
+            Makes Plasma XR selectable as the Home app (the HOME role). Installing it does not change the
+            current Home: switch with
+              adb shell cmd role add-role-holder android.app.role.HOME org.plasmaxr.launcher
+            and switch back with
+              adb shell cmd role add-role-holder android.app.role.HOME com.oculus.systemux
+            See docs/META_SHELL.md.
         -->
         <activity-alias
             android:name=".HomeAlias"
-            android:enabled="false"
+            android:enabled="true"
             android:exported="true"
             android:targetActivity=".PlasmaActivity">
+            <!-- NativeActivity reads this from the component that was launched, which is the alias. -->
+            <meta-data android:name="android.app.lib_name" android:value="plasmaxr" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />

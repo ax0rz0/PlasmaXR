@@ -7,6 +7,7 @@
 // Script commands (one per line, '#' comments):
 //   wait <seconds>          keep dispatching for a while
 //   dump <file.png>         composite the current toplevel (surface, subsurfaces, popups)
+//   dumpall <prefix>        the same for every mapped toplevel: <prefix>-<uid>.png
 //   list                    log toplevels
 //   focus                   give the current toplevel keyboard focus
 //   configure <w> <h>       ask the client for a logical size (0 0 = its choice)
@@ -147,8 +148,7 @@ int main(int argc, char** argv) {
 
     auto toplevel = [&]() -> Toplevel* { return current ? server.findToplevel(current) : nullptr; };
 
-    auto dump = [&](const std::string& path) {
-        Toplevel* t = toplevel();
+    auto dumpTop = [&](Toplevel* t, const std::string& path) {
         if (!t || !t->mapped) {
             fprintf(stderr, "dump: no mapped toplevel\n");
             return;
@@ -190,6 +190,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "dump %s: %dx%d (%zu surfaces)\n", path.c_str(), W, H, vis.size());
         writePng(path, W, H, rgb);
     };
+    auto dump = [&](const std::string& path) { dumpTop(toplevel(), path); };
 
     static const std::map<char, int> keys = {
         {'q', 16}, {'w', 17}, {'e', 18}, {'r', 19}, {'t', 20}, {'y', 21}, {'u', 22}, {'i', 23},
@@ -228,6 +229,10 @@ int main(int argc, char** argv) {
                 std::string p;
                 is >> p;
                 dump(p);
+            } else if (cmd == "dumpall") {  // every mapped toplevel to <prefix>-<uid>.png
+                std::string prefix;
+                is >> prefix;
+                for (Toplevel* t : server.toplevels()) dumpTop(t, prefix + "-" + std::to_string(t->uid) + ".png");
             } else if (cmd == "list") {
                 for (Toplevel* t : server.toplevels()) {
                     fprintf(stderr, "toplevel %u \"%s\" app_id=\"%s\" mapped=%d %dx%d logical, min %dx%d\n",

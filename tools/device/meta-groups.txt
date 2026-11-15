@@ -1,0 +1,45 @@
+# Meta system packages, grouped by how risky they are to turn off.
+# Format:  group | package | what it is
+#
+# optional   Apps and services nothing else depends on. Removing them frees RAM and removes UI
+#            clutter; the headset keeps working exactly as before.
+# maybe      Probably unused, but they may back a feature you use (Link, the phone app). Only ever
+#            disabled by naming them explicitly.
+# social     Presence, friends and avatar features.
+# hud        The system overlays (control bar, display bar, universal menu, notifications). Only
+#            disable these once Plasma XR can do their jobs itself - see docs/META_SHELL.md.
+#
+# Never listed here, on purpose: vrruntimeservice (the OpenXR runtime), vrguardianservice (boundary),
+# horizon (platform service), os.cm, configuration, oemconfig, systemdriver, deviceauthserver,
+# maintenanceboot, anything under vendor.oculus.* and the android core.
+
+optional | com.oculus.guidebook                 | Guidebook (tutorials)
+optional | com.oculus.horizonmediaplayer        | Media player app
+optional | com.oculus.hzosgallery               | Gallery app
+optional | com.oculus.store                      | Meta Horizon Store panel
+optional | com.oculus.avatareditor               | Avatar editor
+optional | com.oculus.assistant                  | Meta AI assistant
+optional | com.oculus.quickpromotionservice      | Promotions
+optional | com.oculus.websafety                  | Web safety (browser filtering)
+optional | com.oculus.tv                         | Meta Horizon TV
+optional | com.oculus.bugreportuploader          | Bug report uploader
+optional | com.meta.linktabula.viewer            | Link viewer
+optional | com.meta.federatedcomputing.oculus    | Federated computing (telemetry)
+optional | com.oculus.ovrmonitormetricsservice   | Metrics collection
+
+maybe    | com.oculus.xrstreamingclient          | Meta XR streaming client (may be used by Link / Air Link)
+maybe    | com.oculus.companion.server           | Phone companion app server (the Meta phone app stops working)
+maybe    | com.oculus.q4b.mdm                    | Quest for Business device management
+maybe    | com.oculus.q4bservice                 | Quest for Business service
+
+social   | com.oculus.presence                   | Friends / presence
+social   | com.oculus.socialplatform             | Social platform
+social   | com.oculus.panelapp.calendar          | Calendar panel
+social   | com.oculus.panelapp.devicepairing     | Device pairing panel
+
+hud      | com.oculus.panelapp.library           | Library panel (Home)
+hud      | com.oculus.panelapp.settings          | Settings panel
+hud      | com.oculus.panelapp.kiosk             | Kiosk panel
+hud      | com.oculus.systemux                   | Universal menu, quick settings, notifications
+hud      | com.meta.systemui                     | System UI overlays
+hud      | com.oculus.vrshell                    | Home environment, control bar, display bar

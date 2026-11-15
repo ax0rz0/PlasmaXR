@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/un.h>
 #include <time.h>
 #include <unistd.h>
@@ -13,10 +14,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-
-#ifdef __ANDROID__
-#include <android/sharedmem.h>
-#endif
+#include <vector>
 
 #include "core/log.h"
 #include "wayland/internal.h"
@@ -56,17 +54,28 @@ std::string formatArgs(const char* sig, const Args& args) {
     return out;
 }
 
-int makeKeymapFd(const char* text, uint32_t* sizeOut) {
+int makeKeymapFd(const char* text, const std::string& dir, uint32_t* sizeOut) {
     const size_t len = strlen(text) + 1;  // clients expect the terminating NUL to be included
-#ifdef __ANDROID__
-    int fd = ASharedMemory_create("plasma-keymap", len);
-#else
-    int fd = memfd_create("plasma-keymap", MFD_CLOEXEC);
+    // A memfd, not ASharedMemory: on 4.19 kernels that is ashmem, which cannot be mapped MAP_PRIVATE
+    // the way clients bound to wl_seat version 7 and up map the keymap (they crash or read zeros).
+    int fd = static_cast<int>(syscall(SYS_memfd_create, "plasma-keymap", 1 /* MFD_CLOEXEC */));
     if (fd >= 0 && ftruncate(fd, static_cast<off_t>(len)) != 0) {
         close(fd);
         fd = -1;
     }
-#endif
+    if (fd < 0) {  // no memfd: an unlinked file next to the socket does the same job
+        std::string tmpl = dir + "/.keymap-XXXXXX";
+        std::vector<char> path(tmpl.begin(), tmpl.end());
+        path.push_back('\0');
+        fd = mkstemp(path.data());
+        if (fd >= 0) {
+            unlink(path.data());
+            if (ftruncate(fd, static_cast<off_t>(len)) != 0) {
+                close(fd);
+                fd = -1;
+            }
+        }
+    }
     if (fd < 0) return -1;
     void* p = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (p == MAP_FAILED) {
@@ -564,7 +573,7 @@ bool Server::start(const std::string& dir, const std::string& name) {
     chmod(path_.c_str(), 0777);
     listenFd_ = fd;
 
-    seat_->keymapFd = makeKeymapFd(kKeymapUs, &seat_->keymapSize);
+    seat_->keymapFd = makeKeymapFd(kKeymapUs, dir, &seat_->keymapSize);
     if (seat_->keymapFd < 0) LOGW("Wayland: could not create the keymap file; keyboards will not work");
 
     registerGlobals();

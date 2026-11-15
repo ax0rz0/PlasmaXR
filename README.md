@@ -16,11 +16,14 @@ Early. Developed and tested on a Quest 2 (Horizon OS, Android 14, OpenXR runtime
 | Wallpaper (procedural sky), taskbar, Kickoff menu, desktop icons, widgets | Working |
 | Real app icons and app list from the headset | Working |
 | Hand tracking (joints, runtime aim pose, pinch, skinned mesh) | Working: both hands tracked with the runtime's aim pose; mesh renders correctly |
-| Pinch-ray interaction | Verified end to end with a *simulated* hand (hover, pinch, release, click). **Not yet verified on live hands** |
+| Pinch-ray interaction | Verified end to end with a *simulated* hand (hover, pinch, release, click) |
+| Touch controllers (aim ray, trigger, thumbstick scroll, haptics) | Implemented; hands pause while a controller is active |
 | Poke (direct touch) interaction | Implemented, not yet exercised |
-| Window manager (docked desktop windows + free-floating windows) | Planned, shell is structured for it |
-| Hosting real Android apps / remote PC windows inside windows | Planned, needs design decisions (see [ROADMAP](docs/ROADMAP.md)) |
-| Passthrough toggle, on-screen keyboard, search | Planned |
+| Window manager (docked desktop windows + free-floating windows) | Written; verified with a Linux window on the headset (screenshot-checked) |
+| Linux apps (Debian arm64 under proot, own Wayland compositor) | Working: foot and weston-simple-shm run on the headset and get shell windows; foot, GTK 3, wev and weston demos are also checked against the compositor in a container (rendering, pointer, keyboard, resize). See [docs/LINUX_APPS.md](docs/LINUX_APPS.md) |
+| Replacing Meta's Home and HUD | In progress, staged and reversible: [docs/META_SHELL.md](docs/META_SHELL.md) |
+| The real Plasma shell (plasmashell) on our compositor | Planned, see [ROADMAP](docs/ROADMAP.md) |
+| Hosting Android apps in windows, on-screen keyboard, passthrough toggle | Planned |
 
 ## Interaction
 
@@ -63,6 +66,8 @@ app/src/main/java/       thin Java side: apps, icons, text rasterising, sounds
 app/src/debug/           debug-only adb command receiver
 docs/                    architecture, hand tracking, debugging, device setup, roadmap
 scripts/                 build / install / log / screenshot helpers
+tools/linux, tools/wayland  Linux environment, compositor test harness and scenarios
+tools/device             reversible control of Meta's system packages
 ```
 
 ## Documentation
@@ -71,6 +76,8 @@ scripts/                 build / install / log / screenshot helpers
 * [Hand tracking and pointer logic](docs/HAND_TRACKING.md)
 * [Debugging over adb](docs/DEBUGGING.md)
 * [Device setup](docs/DEVICE_SETUP.md)
+* [Linux apps](docs/LINUX_APPS.md)
+* [Replacing Meta's shell](docs/META_SHELL.md)
 * [Roadmap](docs/ROADMAP.md)
 
 ## Licence

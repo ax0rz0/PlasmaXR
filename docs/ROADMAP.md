@@ -4,38 +4,31 @@
 
 * OpenXR + GLES renderer, curved UI layers, wallpaper
 * Plasma-style taskbar, Kickoff menu, desktop icons, widgets
-* Hand tracking input (ray + pinch, poke), hand mesh, UI sounds
+* Hand tracking (ray + pinch, poke), hand mesh, Touch controllers, UI sounds
+* Window system: docked and floating windows, move / resize / maximise / minimise, native apps
+* **Linux apps.** A Debian arm64 root filesystem runs under proot, and a Wayland compositor inside the shell
+  turns each Linux window into a shell window. foot and weston-simple-shm run on the headset; GTK 3, wev and
+  weston demos were checked in a container (see [LINUX_APPS.md](LINUX_APPS.md))
+* Reversible tooling for turning off Meta's own apps (see [META_SHELL.md](META_SHELL.md))
 * adb debug channel, offscreen panel snapshots
 
-## Next: windows
+## Now
 
-Plasma is a window system as much as a launcher. The aim is two ways of presenting an app:
+1. **Replace Meta's shell.** Plasma XR becomes the Home app and takes over what the HUD does. Staged and
+   reversible; the plan is in [META_SHELL.md](META_SHELL.md).
+2. **The real Plasma shell.** Run Debian's own `plasmashell` (panel, Task Manager, Kickoff, system tray,
+   Breeze) in the Linux environment and make our compositor play KWin's part: implement KDE's
+   `plasma-shell` and `plasma-window-management` protocols so Plasma's panels and popups become XR panels and
+   every window shows up in the real taskbar. This is how Plasma Mobile works, with a different compositor.
+   A container image with Plasma 6.3 for testing the protocols without a headset is in `tools/wayland`.
+3. **On-screen keyboard** and a way to scroll Linux windows by hand.
 
-* **Docked windows** on the curved desktop, like windows on a monitor: title bar with minimise / maximise /
-  close, move and resize, snapping, z-order, and the taskbar listing them.
-* **Floating windows** anywhere in space: grab the title bar to move in 3D, face-the-user behaviour, resize
-  from the corners, and a button to dock or undock a window.
+## Later
 
-`Panel` already supports a free pose (`Panel::free`), and the taskbar is structured to list windows. What is
-missing is the window manager itself (decorations, drag and resize, focus, minimise, per-desktop sets).
-
-## What goes inside a window
-
-Open question, in order of effort:
-
-1. **Native Plasma XR apps** (settings, file browser, hand-tracking tools) drawn with the existing UI toolkit.
-   No extra setup.
-2. **Android apps hosted in windows.** Needs a virtual display per window, launching activities onto it and
-   injecting touch input, which requires a privileged helper (adb shell, Shizuku or root). Whether Horizon OS
-   permits this needs to be tested on the device first. `XR_KHR_android_surface_swapchain` is available, so
-   frames could go straight to the compositor.
-3. **Remote desktop windows** (VNC / RDP to a PC). Needs a server on the PC and a video path into a layer.
-
-## Also planned
-
+* Steam (ARM64 client, with FEX for x86 games) and SteamVR. Memory is the limit: the headset has 6 GB, and
+  Plasma, Steam and Meta's services all want it.
+* XWayland, so X11 programs get their own windows
+* Android apps hosted in windows (virtual display per window, needs a privileged helper)
 * Passthrough toggle (`XR_FB_passthrough`)
-* On-screen keyboard and search in Kickoff
 * Hand microgestures for scrolling (`XR_META_hand_tracking_microgestures`)
-* Settings app: pointer smoothing, pinch sensitivity, sound, UI scale
-* Real task list via usage stats instead of "launched this session"
-* Controller support as a second pointer source
+* Settings app: pointer smoothing, pinch sensitivity, sound, UI scale, Linux app scale
