@@ -1,0 +1,10 @@
+[versions]
+agp = "9.5.1"
+# Khronos OpenXR loader + headers, packaged as a Prefab AAR.
+openxrLoader = "1.1.65"
+
+[libraries]
+openxr-loader = { module = "org.khronos.openxr:openxr_loader_for_android", version.ref = "openxrLoader" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

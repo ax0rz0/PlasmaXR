@@ -1,0 +1,25 @@
+# The real KDE Plasma shell (plasmashell, panel, Kickoff, Task Manager, system tray, Breeze) from
+# Debian's arm64 packages, for testing against Plasma XR's compositor without a headset.
+# Built on top of the compositor test image; see tools/wayland/test.sh and scenarios/06_plasma.sh.
+FROM plasmaxr-wayland-test
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      plasma-workspace plasma-desktop \
+      breeze breeze-icon-theme \
+      kded6 kactivitymanagerd kglobalacceld \
+      dbus dbus-x11 \
+      plasma-wayland-protocols \
+      libwayland-bin libwayland-dev \
+      qt6-wayland \
+      strace \
+ && rm -rf /var/lib/apt/lists/*
+
+# Plasma wants a session bus and a runtime dir that it owns.
+ENV XDG_CURRENT_DESKTOP=KDE \
+    KDE_FULL_SESSION=true \
+    KDE_SESSION_VERSION=6 \
+    XDG_SESSION_TYPE=wayland \
+    QT_QPA_PLATFORM=wayland \
+    QT_QUICK_BACKEND=software

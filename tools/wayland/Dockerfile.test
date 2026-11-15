@@ -1,0 +1,20 @@
+# Linux environment for testing the compositor against real Wayland clients without a headset.
+# See tools/wayland/test.sh.
+FROM --platform=linux/arm64 debian:trixie-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      g++ make zlib1g-dev \
+      foot foot-terminfo weston wev wayland-utils \
+      xwayland xterm x11-apps \
+      gtk-3-examples \
+      fonts-dejavu-core fontconfig libgl1-mesa-dri xkb-data \
+      procps ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV XDG_RUNTIME_DIR=/run/wl \
+    WAYLAND_DISPLAY=wayland-0 \
+    LANG=C.UTF-8 \
+    LIBGL_ALWAYS_SOFTWARE=1 \
+    GDK_BACKEND=wayland

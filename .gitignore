@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android / NDK
+local.properties
+.cxx/
+.externalNativeBuild/
+captures/
+*.apk
+*.aab
+*.hprof
+
+# Signing material
+*.jks
+*.keystore
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.fleet/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pulled from the headset while debugging (screenshots, panel dumps, logcat)
+/debug-out/
